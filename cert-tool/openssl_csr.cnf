@@ -1,0 +1,29 @@
+#(C) Copyright 2016-2017 Hewlett Packard Enterprise Development LP 
+#
+# OpenSSL configuration file.
+#
+
+# Establish working directory.
+
+[ req ]
+distinguished_name = req_distinguished_name
+req_extensions = CSR
+
+[ req_distinguished_name ]
+C=Country Name (2 letter code)
+C_default=US
+C_min=2
+C_max=2
+ST=State or Province Name (full name)
+ST_default=California
+L=Locality Name (eg, city)
+L_default=Palo Alto
+O=Organization Name (eg, company)
+O_default=Hewlett Packard Enterprise
+CN=Common Name (eg, YOUR name)
+CN_default=prism.atlas.hpe.com
+
+[ CSR ]
+basicConstraints = CA:FALSE
+keyUsage = nonRepudiation, digitalSignature, keyEncipherment
+extendedKeyUsage = serverAuth,clientAuth

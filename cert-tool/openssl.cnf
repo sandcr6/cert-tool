@@ -1,0 +1,145 @@
+#(C) Copyright 2016-2018 Hewlett Packard Enterprise Development LP
+#
+# OpenSSL configuration file.
+#
+
+# Establish working directory.
+
+dir   = .
+
+[ ca ]
+default_ca  = CA_default
+
+[ CA_default ]
+serial   = ${ENV::FOLDER}/serial
+database  = ${ENV::DIR}/index.txt
+new_certs_dir  = ${ENV::FOLDER}
+#private_key       = $dir/ca.key
+#certificate       = $dir/ca.cer
+default_days  = 365
+default_md  = sha256
+preserve  = no
+email_in_dn  = no
+nameopt   = default_ca
+certopt   = default_ca
+default_crl_days = 45
+policy   = policy_match
+prompt=no
+
+[ policy_match ]
+countryName  = match
+stateOrProvinceName = optional
+organizationName = match
+organizationalUnitName = optional
+commonName  = supplied
+emailAddress  = optional
+
+[ req ]
+default_md  = sha256
+distinguished_name = req_distinguished_name
+prompt             = no
+
+[ req_distinguished_name ]
+#countryName = Country
+#countryName_default = US
+#countryName_min = 2
+#countryName_max = 2
+#localityName = Locality
+#localityName_default = Palo Alto
+#organizationName = Organization
+#organizationName_default = HPE
+#commonName = Common Name
+#commonName_max = 64
+
+C  = US
+ST = California
+L  = Palo Alto
+O  = Hewlett-Packard
+CN = ${ENV::COMMON_NAME}
+
+[ certauth ]
+subjectKeyIdentifier = hash
+authorityKeyIdentifier = keyid:always,issuer:always
+keyUsage = digitalSignature, keyEncipherment, dataEncipherment, keyCertSign, cRLSign
+basicConstraints = ${ENV::PATHLEN}
+#crlDistributionPoints = @crl
+authorityInfoAccess = @ocsp_section
+
+[ server ]
+subjectKeyIdentifier = hash
+authorityKeyIdentifier = keyid:always,issuer:always
+basicConstraints = CA:FALSE
+keyUsage = digitalSignature, keyEncipherment, dataEncipherment
+extendedKeyUsage = serverAuth
+nsCertType = server
+crlDistributionPoints = @crl
+subjectAltName = ${ENV::SUBJECT_ALT_NAME}
+
+[ client ]
+subjectKeyIdentifier = hash
+authorityKeyIdentifier = keyid:always,issuer:always
+basicConstraints = CA:FALSE
+keyUsage = digitalSignature, keyEncipherment, dataEncipherment
+extendedKeyUsage = clientAuth,msSmartcardLogin
+nsCertType = client
+crlDistributionPoints = @crl
+authorityInfoAccess = @ocsp_section
+subjectAltName = @alt_names
+
+[ selfSignedServer ]
+subjectKeyIdentifier = hash
+authorityKeyIdentifier = keyid:always,issuer:always
+keyUsage = digitalSignature, keyEncipherment, dataEncipherment
+basicConstraints = CA:FALSE
+subjectAltName = ${ENV::SUBJECT_ALT_NAME}
+extendedKeyUsage = serverAuth
+
+[ selfSignedClient ]
+subjectKeyIdentifier = hash
+authorityKeyIdentifier = keyid:always,issuer:always
+keyUsage = digitalSignature, keyEncipherment, dataEncipherment
+basicConstraints = CA:FALSE
+subjectAltName = @alt_names
+extendedKeyUsage = clientAuth
+
+[ server_client ]
+subjectKeyIdentifier = hash
+authorityKeyIdentifier = keyid:always,issuer:always
+keyUsage = digitalSignature, keyEncipherment, dataEncipherment
+basicConstraints = CA:FALSE
+subjectAltName = ${ENV::SUBJECT_ALT_NAME}
+extendedKeyUsage = serverAuth,clientAuth
+authorityInfoAccess = @ocsp_section
+crlDistributionPoints = @crl
+
+[ v3_intermediate_ca ]
+# Extensions for a typical intermediate CA (`man x509v3_config`).
+subjectKeyIdentifier = hash
+authorityKeyIdentifier = keyid:always,issuer
+basicConstraints = critical, ${ENV::PATHLEN}
+keyUsage = critical, digitalSignature, cRLSign, keyCertSign
+crlDistributionPoints = @crl
+authorityInfoAccess = @ocsp_section
+
+[ crl ]
+URI.1=http://16.125.75.205/crls/${ENV::CRL_URL}.crl
+
+
+[ ocsp_section ]
+OCSP;URI.0 = http://localhost:2560/ocsp
+
+[ ocsp ]
+# Extension for OCSP signing certificates (`man ocsp`).
+basicConstraints = CA:FALSE
+subjectKeyIdentifier = hash
+authorityKeyIdentifier = keyid,issuer
+keyUsage = critical, digitalSignature
+extendedKeyUsage = critical, OCSPSigning
+
+[alt_names]
+# email= ${ENV::SUBJECT_ALT_NAME}
+otherName=msUPN;UTF8:${ENV::SUBJECT_ALT_NAME}
+
+[v3_conf]
+keyUsage = digitalSignature, keyEncipherment, dataEncipherment, keyCertSign, cRLSign
+basicConstraints = CA:FALSE
